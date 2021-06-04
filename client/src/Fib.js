@@ -1,46 +1,38 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 const initialState = { seenIndexes: [], values: {}, index: "" };
 const Fib = () => {
   const [fibState, setFibState] = useState(initialState);
 
-  const renderValues = () => {
-    const entries = [];
+  const renderEntries = () => {
+    const entry = [];
     for (let key in fibState.values) {
-      entries.push(
+      entry.push(
         <div key={key}>
           For index {key}, I calculated {fibState.values[key]}
         </div>
       );
+      return entry;
     }
-    return entries;
   };
-  const fetchValues = useCallback(
-    () => async () => {
-      const values = await axios.get("/api/values/current");
-      setFibState({ ...fibState, values: values.data });
-    },
-    [fibState]
-  );
-
-  const fetchIndexes = useCallback(
-    () => async () => {
-      const seenIndexes = await axios.get("/api/values/all");
-      setFibState({ ...fibState, seenIndexes: seenIndexes.data });
-    },
-    [fibState]
-  );
-
-  const renderIndexesIhaveSeen = () => {
-    return fibState.seenIndexes.map(({ number }) => number).join(", ");
+  const fetchValues = async () => {
+    const values = await axios.get("/api/values/current");
+    return values.data;
   };
+
+  const fetchIndexes = async () => {
+    const seenIndexes = await axios.get("/api/values/all");
+    return seenIndexes.data;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      await fetchValues();
-      await fetchIndexes();
+      const values = await fetchValues();
+      const indexes = await fetchIndexes();
+      setFibState({ ...fibState, seenIndexes: indexes, values: values });
     };
     fetchData();
-  }, [fetchIndexes, fetchValues]);
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -59,9 +51,9 @@ const Fib = () => {
         <button>Submit</button>
       </form>
       <h3> Indexes I have seen</h3>
-      {renderIndexesIhaveSeen()}
+      {fibState.seenIndexes.map(({ number }) => number).join(", ")}
       <h3>Calculated values</h3>
-      {renderValues()}
+      {renderEntries()}
     </div>
   );
 };
