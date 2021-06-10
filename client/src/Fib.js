@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-const initialState = { seenIndexes: [], values: {}, index: "" };
+const initialState = {
+  seenIndexes: [],
+  values: { 5: "8", 6: "13" },
+  index: "",
+};
 const Fib = () => {
   const [fibState, setFibState] = useState(initialState);
 
   const renderEntries = () => {
     const entry = [];
+    console.log(fibState.values, "obj");
     for (let key in fibState.values) {
+      console.log(key, "key");
       entry.push(
         <div key={key}>
           For index {key}, I calculated {fibState.values[key]}
         </div>
       );
-      return entry;
     }
+    return entry;
   };
   const fetchValues = async () => {
     const values = await axios.get("/api/values/current");
