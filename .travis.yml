@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+
+  # we need to provide the path of the docker file in the client directory
+  # specifying the build context
+before_install:
+  - docker build -t ananthbkdocker/react-test -f ./client/Docker.dev ./client
+
+  # for running tests
+script:
+  - docker run -e CI=true ananthbkdocker/react-test npm test
+
+  # build the individual docker images
+after_success:
+  - docker build -t ananthbkdocker/multi-client ./client
+  - docker build -t ananthbkdocker/multi-nginx ./nginx
+  - docker build -t ananthbkdocker/multi-server ./server
+  - docker build -t ananthbkdocker/multi-worker ./worker
+  #Login to docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # pushing the images to docker hub
+  - docker push ananthbkdocker/multi-client
+  - docker push ananthbkdocker/multi-nginx
+  - docker push ananthbkdocker/multi-server
+  - docker push ananthbkdocker/multi-worker
