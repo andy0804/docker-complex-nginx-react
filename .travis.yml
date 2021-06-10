@@ -5,7 +5,7 @@ services:
   # we need to provide the path of the docker file in the client directory
   # specifying the build context
 before_install:
-  - docker build -t ananthbkdocker/react-test -f ./client/Docker.dev ./client
+  - docker build -t ananthbkdocker/react-test -f ./client/Dockerfile.dev ./client
 
   # for running tests
 script:
